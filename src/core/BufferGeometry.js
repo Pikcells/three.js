@@ -40,7 +40,9 @@ function BufferGeometry() {
 
 }
 
-Object.assign( BufferGeometry.prototype, EventDispatcher.prototype, {
+BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), {
+
+	constructor: BufferGeometry,
 
 	isBufferGeometry: true,
 
@@ -276,15 +278,21 @@ Object.assign( BufferGeometry.prototype, EventDispatcher.prototype, {
 
 	center: function () {
 
-		this.computeBoundingBox();
+		var offset = new Vector3();
 
-		var offset = this.boundingBox.getCenter().negate();
+		return function center() {
 
-		this.translate( offset.x, offset.y, offset.z );
+			this.computeBoundingBox();
 
-		return offset;
+			this.boundingBox.getCenter( offset ).negate();
 
-	},
+			this.translate( offset.x, offset.y, offset.z );
+
+			return this;
+
+		};
+
+	}(),
 
 	setFromObject: function ( object ) {
 
@@ -329,6 +337,23 @@ Object.assign( BufferGeometry.prototype, EventDispatcher.prototype, {
 			}
 
 		}
+
+		return this;
+
+	},
+
+	setFromPoints: function ( points ) {
+
+		var position = [];
+
+		for ( var i = 0, l = points.length; i < l; i ++ ) {
+
+			var point = points[ i ];
+			position.push( point.x, point.y, point.z || 0 );
+
+		}
+
+		this.addAttribute( 'position', new Float32BufferAttribute( position, 3 ) );
 
 		return this;
 
@@ -499,14 +524,6 @@ Object.assign( BufferGeometry.prototype, EventDispatcher.prototype, {
 
 			var uvs2 = new Float32Array( geometry.uvs2.length * 2 );
 			this.addAttribute( 'uv2', new BufferAttribute( uvs2, 2 ).copyVector2sArray( geometry.uvs2 ) );
-
-		}
-
-		if ( geometry.indices.length > 0 ) {
-
-			var TypeArray = arrayMax( geometry.indices ) > 65535 ? Uint32Array : Uint16Array;
-			var indices = new TypeArray( geometry.indices.length * 3 );
-			this.setIndex( new BufferAttribute( indices, 1 ).copyIndicesArray( geometry.indices ) );
 
 		}
 
@@ -783,7 +800,16 @@ Object.assign( BufferGeometry.prototype, EventDispatcher.prototype, {
 
 		}
 
-		if ( offset === undefined ) offset = 0;
+		if ( offset === undefined ) {
+
+			offset = 0;
+
+			console.warn(
+				'THREE.BufferGeometry.merge(): Overwriting original geometry, starting at offset=0. '
+				+ 'Use BufferGeometryUtils.mergeBufferGeometries() for lossless merge.'
+			);
+
+		}
 
 		var attributes = this.attributes;
 
@@ -873,6 +899,15 @@ Object.assign( BufferGeometry.prototype, EventDispatcher.prototype, {
 			}
 
 			geometry2.addAttribute( name, new BufferAttribute( array2, itemSize ) );
+
+		}
+
+		var groups = this.groups;
+
+		for ( var i = 0, l = groups.length; i < l; i ++ ) {
+
+			var group = groups[ i ];
+			geometry2.addGroup( group.start, group.count, group.materialIndex );
 
 		}
 

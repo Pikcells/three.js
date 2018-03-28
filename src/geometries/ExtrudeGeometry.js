@@ -615,7 +615,7 @@ ExtrudeBufferGeometry.prototype.addShape = function ( shape, options ) {
 
 		}
 
-		scope.addGroup( start, verticesArray.length / 3 - start, options.material !== undefined ? options.material : 0 );
+		scope.addGroup( start, verticesArray.length / 3 - start, 0 );
 
 	}
 
@@ -639,7 +639,7 @@ ExtrudeBufferGeometry.prototype.addShape = function ( shape, options ) {
 		}
 
 
-		scope.addGroup( start, verticesArray.length / 3 - start, options.extrudeMaterial !== undefined ? options.extrudeMaterial : 1 );
+		scope.addGroup( start, verticesArray.length / 3 - start, 1 );
 
 
 	}
@@ -747,7 +747,7 @@ ExtrudeBufferGeometry.prototype.addShape = function ( shape, options ) {
 
 		this.setIndex( indicesArray );
 		this.addAttribute( 'position', new Float32BufferAttribute( verticesArray, 3 ) );
-		this.addAttribute( 'uv', new Float32BufferAttribute( options.arrays.uv, 2 ) );
+		this.addAttribute( 'uv', new Float32BufferAttribute( uvArray, 2 ) );
 
 	}
 

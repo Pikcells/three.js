@@ -3,9 +3,9 @@
  *
  */
 
-THREE.Refractor = function ( width, height, options ) {
+THREE.Refractor = function ( geometry, options ) {
 
-	THREE.Mesh.call( this, new THREE.PlaneBufferGeometry( width, height ) );
+	THREE.Mesh.call( this, geometry );
 
 	this.type = 'Refractor';
 
@@ -250,6 +250,12 @@ THREE.Refractor = function ( width, height, options ) {
 		updateVirtualCamera( camera );
 
 		render( renderer, scene, camera );
+
+	};
+
+	this.getRenderTarget = function () {
+
+		return renderTarget;
 
 	};
 

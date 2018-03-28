@@ -4,6 +4,8 @@
 		<title>three.js webvr - gear vr</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+		<!-- Origin Trial Token, feature = WebVR (For Chrome M62+), origin = https://threejs.org, expires = 2018-04-03 -->
+		<meta http-equiv="origin-trial" data-feature="WebVR (For Chrome M62+)" data-expires="2018-04-03" content="AqIrNtaoJSmDZatgEEW2ehuK9ITIiFk3gZ3/gC6Vp0gF85NDYl7IzVPj4Bh7O6SIcr3ICOm6kocYSaS+BPkazgYAAABQeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJWUjEuMU02MiIsImV4cGlyeSI6MTUyMjc2MzAwMn0=">
 		<style>
 			body {
 				font-family: Monospace;
@@ -24,16 +26,10 @@
 		<script src="js/loaders/MTLLoader.js"></script>
 		<script src="js/loaders/OBJLoader.js"></script>
 
-        <script src="js/vr/GearVRController.js"></script>
+		<script src="js/vr/GearVRController.js"></script>
 		<script src="js/vr/WebVR.js"></script>
 
 		<script>
-
-			WEBVR.checkAvailability().catch( function ( message ) {
-
-				document.body.appendChild( WEBVR.getMessageContainer( message ) );
-
-			} );
 
 			var clock = new THREE.Clock();
 
@@ -63,12 +59,6 @@
 				scene.background = new THREE.Color( 0x505050 );
 
 				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.1, 10 );
-				camBox = new THREE.Object3D();
-
-				camBox.position.y = 1.8;
-
-				camBox.add( camera );
-				scene.add( camBox );
 
 				room = new THREE.Mesh(
 					new THREE.BoxGeometry( 6, 6, 6, 8, 8, 8 ),
@@ -116,14 +106,14 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.vr.enabled = true;
 				container.appendChild( renderer.domElement );
 
-				renderer.vr.enabled = true;
+				document.body.appendChild( WEBVR.createButton( renderer ) );
 
 				controller = new THREE.GearVRController();
-				camBox.position.y = 1.8;
-				controller.setHand( 'right' );
-				camBox.add( controller );
+				controller.position.set( 0.25, 0.75, 0 );
+				scene.add( controller );
 
 				var skyBox = {
 					front: 'textures/cube/Bridge2/posz.jpg',
@@ -160,14 +150,6 @@
 
 				} );
 
-				WEBVR.getVRDisplay( function ( display ) {
-
-					renderer.vr.setDevice( display );
-
-					document.body.appendChild( WEBVR.getButton( display, renderer.domElement ) );
-
-				} );
-
 				window.addEventListener( 'resize', onWindowResize, false );
 
 			}
@@ -193,11 +175,27 @@
 
 				controller.update();
 
+				if ( controller.getTouchpadState() === true ) {
+
+					var cube = room.children[ 0 ];
+					room.remove( cube );
+
+					cube.position.copy( controller.position );
+					cube.userData.velocity.x = ( Math.random() - 0.5 ) * 0.02 * delta;
+					cube.userData.velocity.y = ( Math.random() - 0.5 ) * 0.02 * delta;
+					cube.userData.velocity.z = ( Math.random() * 0.01 - 0.05 ) * delta;
+					cube.userData.velocity.applyQuaternion( controller.quaternion );
+					room.add( cube );
+
+				}
+
+				// keep cubes inside room
+
 				for ( var i = 0; i < room.children.length; i ++ ) {
 
 					var cube = room.children[ i ];
 
-					if ( cube.geometry instanceof THREE.BoxGeometry === false ) continue;
+					cube.position.add( cube.userData.velocity );
 
 					if ( cube.position.x < - 3 || cube.position.x > 3 ) {
 
@@ -220,7 +218,9 @@
 
 					}
 
-					cube.rotation.x += 0.01 * delta;
+					cube.rotation.x += cube.userData.velocity.x * 2 * delta;
+					cube.rotation.y += cube.userData.velocity.y * 2 * delta;
+					cube.rotation.z += cube.userData.velocity.z * 2 * delta;
 
 				}
 

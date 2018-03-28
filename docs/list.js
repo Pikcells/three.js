@@ -5,8 +5,9 @@ var list = {
 		"Getting Started": {
 			"Creating a scene": "manual/introduction/Creating-a-scene",
 			"Import via modules": "manual/introduction/Import-via-modules",
+			"Browser support": "manual/introduction/Browser-support",
 			"WebGL compatibility check": "manual/introduction/WebGL-compatibility-check",
-			"How to run things locally": "manual/introduction/How-to-run-thing-locally",
+			"How to run things locally": "manual/introduction/How-to-run-things-locally",
 			"Drawing Lines": "manual/introduction/Drawing-lines",
 			"Creating Text": "manual/introduction/Creating-text",
 			"Migration Guide": "manual/introduction/Migration-guide",
@@ -103,7 +104,7 @@ var list = {
 		},
 
 		"Extras": {
-			"SceneUtils": "api/extras/SceneUtils",
+			"Earcut": "api/extras/Earcut",
 			"ShapeUtils": "api/extras/ShapeUtils"
 		},
 
@@ -146,8 +147,8 @@ var list = {
 			"DodecahedronBufferGeometry": "api/geometries/DodecahedronBufferGeometry",
 			"DodecahedronGeometry": "api/geometries/DodecahedronGeometry",
 			"EdgesGeometry": "api/geometries/EdgesGeometry",
-			"ExtrudeGeometry": "api/geometries/ExtrudeGeometry",
 			"ExtrudeBufferGeometry": "api/geometries/ExtrudeBufferGeometry",
+			"ExtrudeGeometry": "api/geometries/ExtrudeGeometry",
 			"IcosahedronBufferGeometry": "api/geometries/IcosahedronBufferGeometry",
 			"IcosahedronGeometry": "api/geometries/IcosahedronGeometry",
 			"LatheBufferGeometry": "api/geometries/LatheBufferGeometry",
@@ -174,8 +175,8 @@ var list = {
 			"TorusGeometry": "api/geometries/TorusGeometry",
 			"TorusKnotBufferGeometry": "api/geometries/TorusKnotBufferGeometry",
 			"TorusKnotGeometry": "api/geometries/TorusKnotGeometry",
-			"TubeGeometry": "api/geometries/TubeGeometry",
 			"TubeBufferGeometry": "api/geometries/TubeBufferGeometry",
+			"TubeGeometry": "api/geometries/TubeGeometry",
 			"WireframeGeometry": "api/geometries/WireframeGeometry"
 		},
 
@@ -211,7 +212,6 @@ var list = {
 		"Lights / Shadows": {
 			"DirectionalLightShadow": "api/lights/shadows/DirectionalLightShadow",
 			"LightShadow": "api/lights/shadows/LightShadow",
-			"RectAreaLightShadow": "api/lights/shadows/RectAreaLightShadow",
 			"SpotLightShadow": "api/lights/shadows/SpotLightShadow"
 		},
 
@@ -225,9 +225,11 @@ var list = {
 			"DataTextureLoader": "api/loaders/DataTextureLoader",
 			"FileLoader": "api/loaders/FileLoader",
 			"FontLoader": "api/loaders/FontLoader",
+			"ImageBitmapLoader": "api/loaders/ImageBitmapLoader",
 			"ImageLoader": "api/loaders/ImageLoader",
 			"JSONLoader": "api/loaders/JSONLoader",
 			"Loader": "api/loaders/Loader",
+			"LoaderUtils": "api/loaders/LoaderUtils",
 			"MaterialLoader": "api/loaders/MaterialLoader",
 			"ObjectLoader": "api/loaders/ObjectLoader",
 			"TextureLoader": "api/loaders/TextureLoader"
@@ -290,7 +292,6 @@ var list = {
 		"Objects": {
 			"Bone": "api/objects/Bone",
 			"Group": "api/objects/Group",
-			"LensFlare": "api/objects/LensFlare",
 			"Line": "api/objects/Line",
 			"LineLoop": "api/objects/LineLoop",
 			"LineSegments": "api/objects/LineSegments",
@@ -355,7 +356,12 @@ var list = {
 			"PCDLoader": "examples/loaders/PCDLoader",
 			"PDBLoader": "examples/loaders/PDBLoader",
 			"SVGLoader": "examples/loaders/SVGLoader",
-			"TGALoader": "examples/loaders/TGALoader"
+			"TGALoader": "examples/loaders/TGALoader",
+			"PRWMLoader": "examples/loaders/PRWMLoader"
+		},
+
+		"Objects": {
+			"Lensflare": "examples/objects/Lensflare",
 		},
 
 		"Exporters": {
@@ -376,7 +382,14 @@ var list = {
 		},
 
 		"Renderers": {
-			"CanvasRenderer": "examples/renderers/CanvasRenderer"
+			"CanvasRenderer": "examples/renderers/CanvasRenderer",
+			"CSS3DRenderer": "examples/renderers/CSS3DRenderer",
+			"CSS2DRenderer": "examples/renderers/CSS2DRenderer"
+		},
+
+		"Utils": {
+			"BufferGeometryUtils": "examples/BufferGeometryUtils",
+			"SceneUtils": "examples/utils/SceneUtils"
 		}
 
 	},
@@ -394,7 +407,6 @@ var list = {
 		},
 
 		"WebGLRenderer / Plugins": {
-			"LensFlarePlugin": "api/renderers/webgl/plugins/LensFlarePlugin",
 			"SpritePlugin": "api/renderers/webgl/plugins/SpritePlugin"
 		}
 

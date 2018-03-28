@@ -101,7 +101,7 @@ THREE.MMDLoader.prototype.loadModel = function ( url, callback, onProgress, onEr
 
 	var scope = this;
 
-	var texturePath = this.extractUrlBase( url );
+	var texturePath = THREE.LoaderUtils.extractUrlBase( url );
 	var modelExtension = this.extractExtension( url );
 
 	this.loadFileAsBuffer( url, function ( buffer ) {
@@ -1476,7 +1476,7 @@ THREE.MMDLoader.prototype.createMesh = function ( model, texturePath, onProgress
 		geometry.addAttribute( 'position', new THREE.Float32BufferAttribute( buffer.vertices, 3 ) );
 		geometry.addAttribute( 'normal', new THREE.Float32BufferAttribute( buffer.normals, 3 ) );
 		geometry.addAttribute( 'uv', new THREE.Float32BufferAttribute( buffer.uvs, 2 ) );
-		geometry.addAttribute( 'skinIndex', new THREE.Float32BufferAttribute( buffer.skinIndices, 4 ) );
+		geometry.addAttribute( 'skinIndex', new THREE.Uint16BufferAttribute( buffer.skinIndices, 4 ) );
 		geometry.addAttribute( 'skinWeight', new THREE.Float32BufferAttribute( buffer.skinWeights, 4 ) );
 
 		geometry.computeBoundingSphere();

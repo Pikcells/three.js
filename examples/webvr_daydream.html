@@ -4,8 +4,8 @@
 		<title>three.js webvr - daydream</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-		<!-- Origin Trial Token, feature = WebVR (For Chrome M59+), origin = https://threejs.org, expires = 2017-10-09 -->
-		<meta http-equiv="origin-trial" data-feature="WebVR (For Chrome M59+)" data-expires="2017-10-09" content="AjrMPp+ZdEH97MOiKUzcpxLvh+B6I0CL55bPSbvQxL5ggVHl7X2dyEwTfXUgaMV7YLPOev4VZ4Uz+jMTsx3MPQEAAABNeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJWUjEuMSIsImV4cGlyeSI6MTUwNzU3MTAwOH0=">
+		<!-- Origin Trial Token, feature = WebVR (For Chrome M62+), origin = https://threejs.org, expires = 2018-04-03 -->
+		<meta http-equiv="origin-trial" data-feature="WebVR (For Chrome M62+)" data-expires="2018-04-03" content="AqIrNtaoJSmDZatgEEW2ehuK9ITIiFk3gZ3/gC6Vp0gF85NDYl7IzVPj4Bh7O6SIcr3ICOm6kocYSaS+BPkazgYAAABQeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJWUjEuMU02MiIsImV4cGlyeSI6MTUyMjc2MzAwMn0=">
 		<style>
 			body {
 				font-family: Monospace;
@@ -28,19 +28,11 @@
 
 		<script>
 
-			WEBVR.checkAvailability().catch( function( message ) {
-
-				document.body.appendChild( WEBVR.getMessageContainer( message ) );
-
-			} );
-
-			//
-
 			var clock = new THREE.Clock();
 
 			var container;
 			var camera, scene, ray, raycaster, renderer;
-			var gamepad;
+			var controller;
 
 			var room;
 
@@ -76,6 +68,7 @@
 					new THREE.BoxGeometry( 6, 6, 6, 8, 8, 8 ),
 					new THREE.MeshBasicMaterial( { color: 0x808080, wireframe: true } )
 				);
+				room.position.y = 3;
 				scene.add( room );
 
 				scene.add( new THREE.HemisphereLight( 0x606060, 0x404040 ) );
@@ -120,34 +113,28 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.vr.enabled = true;
 				container.appendChild( renderer.domElement );
 
-				renderer.vr.enabled = true;
+				//
+
+				document.body.appendChild( WEBVR.createButton( renderer ) );
 
 				//
 
-				WEBVR.getVRDisplay( function ( device ) {
-
-					renderer.vr.setDevice( device );
-					document.body.appendChild( WEBVR.getButton( device, renderer.domElement ) );
-
-				} );
+				controller = new THREE.DaydreamController();
+				controller.position.set( 0.3, 0.75, 0 );
+				scene.add( controller );
 
 				//
 
-				gamepad = new THREE.DaydreamController();
-				gamepad.position.set( 0.25, - 0.5, 0 );
-				scene.add( gamepad );
-
-				//
-
-				var gamepadHelper = new THREE.Line( new THREE.BufferGeometry(), new THREE.LineBasicMaterial( { linewidth: 4 } ) );
-				gamepadHelper.geometry.addAttribute( 'position', new THREE.Float32BufferAttribute( [ 0, 0, 0, 0, 0, - 10 ], 3 ) );
-				gamepad.add( gamepadHelper );
+				var controllerHelper = new THREE.Line( new THREE.BufferGeometry(), new THREE.LineBasicMaterial( { linewidth: 4 } ) );
+				controllerHelper.geometry.addAttribute( 'position', new THREE.Float32BufferAttribute( [ 0, 0, 0, 0, 0, - 10 ], 3 ) );
+				controller.add( controllerHelper );
 
 				renderer.domElement.addEventListener( 'click', function ( event ) {
 
-					gamepadHelper.material.color.setHex( Math.random() * 0xffffff );
+					controllerHelper.material.color.setHex( Math.random() * 0xffffff );
 
 				} );
 
@@ -176,14 +163,28 @@
 
 			function render() {
 
-				gamepad.update();
-
 				var delta = clock.getDelta() * 60;
+
+				controller.update();
+
+				if ( controller.getTouchpadState() === true ) {
+
+					var cube = room.children[ 0 ];
+					room.remove( cube );
+
+					cube.position.copy( controller.position );
+					cube.userData.velocity.x = ( Math.random() - 0.5 ) * 0.02 * delta;
+					cube.userData.velocity.y = ( Math.random() - 0.5 ) * 0.02 * delta;
+					cube.userData.velocity.z = ( Math.random() * 0.01 - 0.05 ) * delta;
+					cube.userData.velocity.applyQuaternion( controller.quaternion );
+					room.add( cube );
+
+				}
 
 				// find intersections
 
-				raycaster.ray.origin.copy( gamepad.position );
-				raycaster.ray.direction.set( 0, 0, - 1 ).applyQuaternion( gamepad.quaternion );
+				raycaster.ray.origin.copy( controller.position );
+				raycaster.ray.direction.set( 0, 0, - 1 ).applyQuaternion( controller.quaternion );
 
 				var intersects = raycaster.intersectObjects( room.children );
 
