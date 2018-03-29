@@ -9,8 +9,9 @@ var Loader = function ( editor ) {
 
 	this.texturePath = '';
 
-	this.loadFile = function ( file ) {
+	this.loadFile = function ( files ) {
 
+		var file = files[0];
 		var filename = file.name;
 		var extension = filename.split( '.' ).pop().toLowerCase();
 
@@ -172,33 +173,40 @@ var Loader = function ( editor ) {
 			case 'glb':
 			case 'gltf':
 
-				reader.addEventListener( 'load', function ( event ) {
+				if ( files.length == 2 ){
 
-					var contents = event.target.result;
-					var loader;
+					if ( files[1].name.split( '.' ).pop().toLowerCase() == 'bin' ){
 
-					if ( isGltf1( contents ) ) {
-
-						loader = new THREE.LegacyGLTFLoader();
-
-					} else {
-
-						loader = new THREE.GLTFLoader();
+						loadGLTF(files[0], files[1]);
 
 					}
 
-					loader.parse( contents, '', function ( result ) {
+					
+				}else{
 
-						result.scene.name = filename;
-						editor.execute( new AddObjectCommand( result.scene ) );
+					console.warn("gltf requires a bianry file as well, drag the .gltf and .bin file into the window to load.");
 
-					} );
-
-				}, false );
-				reader.readAsArrayBuffer( file );
+				}
 
 				break;
+			case 'bin':
 
+				if ( files.length == 2 ){
+
+					if ( files[1].name.split( '.' ).pop().toLowerCase() == 'gltf' ){
+
+						loadGLTF(files[1], files[0]);
+
+					}
+
+					
+				}else{
+
+					console.warn("gltf requires a bianry file as well, drag the .gltf and .bin file into the window to load.");
+
+				}
+
+				break;
 			case 'js':
 			case 'json':
 
@@ -470,6 +478,36 @@ var Loader = function ( editor ) {
 		}
 
 	};
+
+	function loadGLTF( json, binary ) {
+
+		var jsonUrl = URL.createObjectURL(json);
+		var binaryURL = URL.createObjectURL(binary);
+
+		var baseURL = THREE.LoaderUtils.extractUrlBase(jsonUrl);
+		var manager = new THREE.LoadingManager();
+		var rootPath = json.webkitRelativePath;
+
+		// Intercept and override relative URLs.
+		manager.setURLModifier(function(url, path) {
+
+			if (url != jsonUrl)
+				url = binaryURL;
+
+			return url;
+
+		});
+
+		var loader = new THREE.GLTFLoader(manager);
+		loader.load( jsonUrl, function ( result ) {
+
+			result.scene.name = json.name;
+			editor.execute( new AddObjectCommand( result.scene ) );
+
+		});
+
+
+	}
 
 	function handleJSON( data, file, filename ) {
 
