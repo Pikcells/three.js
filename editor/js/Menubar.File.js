@@ -58,7 +58,7 @@ Menubar.File = function ( editor ) {
 	fileInput.type = 'file';
 	fileInput.addEventListener( 'change', function ( event ) {
 
-		editor.loader.loadFile( fileInput.files[ 0 ] );
+		editor.loader.loadFile( fileInput.files );
 		form.reset();
 
 	} );
@@ -200,6 +200,34 @@ Menubar.File = function ( editor ) {
 			// forceIndices: true, forcePowerOfTwoTextures: true
 			// to allow compatibility with facebook
 		}, { binary: true, forceIndices: true, forcePowerOfTwoTextures: true } );
+		
+	} );
+	options.add( option );
+
+	// Export pikcells
+
+	var option = new UI.Row();
+	option.setClass( 'option' );
+	option.setTextContent( 'Export PIKCELLS' );
+	option.onClick( function () {
+
+		var exporter = new THREE.PIKCELLSExporter();
+		var parsed = exporter.parse(editor.scene);
+
+		// for (var i=0; i<object.geometries.length; i++){
+
+		// 	var a = document.createElement("a");
+		// 	document.body.appendChild(a);
+		// 	a.style = "display: none";
+		// 	var blob = new Blob(object.geometries[i], {type: "octet/stream"}),
+		// 	url = window.URL.createObjectURL(blob);
+		// 	a.href = url;
+		// 	a.download = "bin" + i + ".bin";
+		// 	a.click();
+		// 	window.URL.revokeObjectURL(url);
+
+		// }
+		saveString( JSON.stringify(parsed), 'scene.pikcells' );
 		
 	} );
 	options.add( option );

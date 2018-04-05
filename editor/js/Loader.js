@@ -207,6 +207,30 @@ var Loader = function ( editor ) {
 				}
 
 				break;
+			case 'pikcells':
+
+				reader.addEventListener( 'load', function ( event ) {
+
+					var contents = event.target.result;
+					var loader = new THREE.PIKCELLSLoader();
+					var objects = loader.parse(contents);
+
+					for (var i=0; i<objects.length; i++){
+
+						var object = objects[i];
+						editor.execute( new AddObjectCommand( object ) );
+
+					}
+
+					// var loader = new THREE.FBXLoader();
+					// var object = loader.parse( contents );
+
+					// editor.execute( new AddObjectCommand( object ) );
+
+				}, false );
+				reader.readAsText( file );
+
+				break;
 			case 'js':
 			case 'json':
 
