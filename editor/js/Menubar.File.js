@@ -67,11 +67,11 @@ Menubar.File = function ( editor ) {
 			    	0, 
 			    	height, 
 			    	width);
-	    	var dataURL = canvas.toDataURL('image/jpg');
+	    	var dataURL = canvas.toDataURL('image/png');
 
 	    	// Write the file out
 	    	var imgBase64 = dataURL.split('base64,');
-			file.file( name + ".jpg", imgBase64[1], {base64: true} );
+			file.file( name + ".png", imgBase64[1], {base64: true} );
 
 		}
 
