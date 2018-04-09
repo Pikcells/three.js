@@ -81,7 +81,7 @@ UI.Texture = function ( mapping ) {
 						texture.sourceFile = file.name;
 						texture.format = file.type === 'image/jpeg' ? THREE.RGBFormat : THREE.RGBAFormat;
 						texture.needsUpdate = true;
-
+						
 						scope.setValue( texture );
 
 						if ( scope.onChangeCallback ) scope.onChangeCallback();

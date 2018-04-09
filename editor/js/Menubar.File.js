@@ -12,6 +12,190 @@ Menubar.File = function ( editor ) {
 
 	}
 
+	var ExportMaterial = function ( name ) {
+
+		name = name || "material";
+
+		var zip = new JSZip();
+		var materialFile = zip.folder(name);
+		var materialObject = {};
+
+		var matToExport;
+
+		if ( editor.selected.material ){
+
+			matToExport = editor.selected.material;
+
+		}else{
+
+			alert("No material selected");
+			return;
+
+		}
+
+		materialObject = MakeMaterialObjectForMaterial( matToExport, materialFile, null, editor.selected );
+		materialObject.type = matToExport.type;
+
+		materialFile.file("material.json", JSON.stringify(materialObject));
+		saveAs(zip.generate({type:"blob"}), name + ".zip");
+
+	}
+
+	var ExportImage = function ( image, name, file, levels ) {
+
+		var canvas = document.createElement('CANVAS');
+		var ctx = canvas.getContext('2d');
+
+		levels = 1; // Disabling levels
+
+		for ( var i=0; i<levels; i++ ){
+
+			// Divide the size of the image by a factor of 2 for each level
+			var height = image.height/Math.pow(2, i);
+			var width = image.height/Math.pow(2, i);
+
+			// Make sure the image is never too small to render
+			if (height < 1)
+				height = 1;
+			if (width < 1)
+				wdith = 1;
+
+	    	canvas.height = height;
+	    	canvas.width = width;
+	    	ctx.drawImage(image, 
+			    	0, 
+			    	0, 
+			    	height, 
+			    	width);
+	    	var dataURL = canvas.toDataURL('image/jpg');
+
+	    	// Write the file out
+	    	var imgBase64 = dataURL.split('base64,');
+			file.file( name + ".jpg", imgBase64[1], {base64: true} );
+
+		}
+
+		canvas = null;
+		context = null;
+
+	}
+
+	var MakeMaterialObjectForMaterial = function ( material, materialFile, index, model ) {
+
+		if ( index == null )
+			index = '';
+
+		var materialObject = { };
+
+		materialObject.side = material.side;
+		materialObject.color = material.color.getHex();
+		materialObject.normalMap = false;
+		materialObject.metalnessMap = false;
+		materialObject.roughnessMap = false;
+		materialObject.alphaMap = false;
+		materialObject.lightMapOverride = false;
+		materialObject.diffuse = false;
+		materialObject.type = material.type;
+
+		if (material.envMapIntensity)
+			materialObject.envMapIntensity = parseFloat(material.envMapIntensity);
+
+		if ( material.type == "MeshPhysicalMaterial" ){
+
+			materialObject.metalness = material.metalness;
+			materialObject.roughness = material.roughness;
+
+		}else {
+
+			materialObject.reflectivity = material.reflectivity;
+
+		}
+			
+
+		if ( material.lightMapIntensity != undefined );
+
+			materialObject.lightMapOverrideIntensity = material.lightMapIntensity;
+
+		if ( material.lightMapOverride && material.lightMap  ){
+
+			materialObject.lightMapOverride = "lightmapoverride.jpg";
+			materialObject.lightMapOverrideIntensity = material.lightMapIntensity;
+			materialFile.file( "lightmapoverride." + material.lightMapOverrideExt, material.lightMapOverrideBinary, {binary: true} );
+			ExportImage( material.lightMapOverride.image, 
+				"lightmapoverride",
+				materialFile,
+				5 );
+
+		}
+
+		if (material.scale1 ) { // UV Scale 1
+			materialObject.scale = material.scale1;
+		}
+
+		if ( material.map ){
+
+			materialObject.diffuse = "diffuse.jpg";
+			ExportImage( material.map.image, 
+				"diffuse",
+				materialFile,
+				5 );
+
+		}
+
+		if ( material.specularMap ){
+
+			materialObject.specularMap = "specularmap.jpg";
+			ExportImage(  material.specularMap.image, 
+				"specularmap",
+				materialFile,
+				5 );
+
+		}
+
+		if ( material.metalnessMap ){
+
+			materialObject.metalnessMap = "metalnessmap.jpg";
+			ExportImage( material.metalnessMap.image, 
+				"metalnessmap",
+				materialFile,
+				5 );
+
+		}
+
+		if ( material.roughnessMap ){
+
+			materialObject.roughnessMap = "roughnessmap.jpg";
+			ExportImage( material.roughnessMap.image, 
+				"roughnessmap",
+				materialFile,
+				1 );
+
+		}
+
+		if ( material.alphaMap ){
+
+			materialObject.alphaMap = "alphamap.jpg";
+			ExportImage( material.alphaMap.image, 
+				"alphamap",
+				materialFile,
+				1 );
+
+		}
+
+		if ( material.normalMap ){
+
+			materialObject.normalMap = "normalmap.jpg";
+			ExportImage( material.normalMap.image, 
+				"normalmap",
+				materialFile,
+				1 );
+
+		}
+
+		return materialObject;
+
+	}
+
 	//
 
 	var config = editor.config;
@@ -77,6 +261,36 @@ Menubar.File = function ( editor ) {
 	//
 
 	options.add( new UI.HorizontalRule() );
+
+	// Export Material
+
+	var option = new UI.Row();
+	option.setClass( 'option' );
+	option.setTextContent( 'Export Material' );
+	option.onClick( function () {
+
+		var object = editor.selected;
+
+		if ( object === null ) {
+
+			alert( 'No object selected.' );
+			return;
+
+		}
+
+		var material = object.material;
+
+		if ( material === undefined ) {
+
+			alert( 'The selected object doesn\'t have a material.' );
+			return;
+
+		}
+
+		ExportMaterial("material");
+
+	} );
+	options.add( option );
 
 	// Export Geometry
 
