@@ -9,6 +9,446 @@ var Loader = function ( editor ) {
 
 	this.texturePath = '';
 
+	this.getFile = function ( file ) {
+
+		var extension = file.split( '.' ).pop().toLowerCase();
+		var reader = new FileReader();
+		// reader.addEventListener( 'progress', function ( event ) {
+
+		// 	var size = '(' + Math.floor( event.total / 1000 ).format() + ' KB)';
+		// 	var progress = Math.floor( ( event.loaded / event.total ) * 100 ) + '%';
+		// 	console.log( 'Loading', filename, size, progress );
+
+		// } );
+
+		switch ( extension ) {
+
+			case '3ds':
+
+				var loader = new THREE.TDSLoader();
+				var object = loader.load( file, function( object ){
+
+					editor.execute( new AddObjectCommand( object ) );
+
+				} );
+
+				break;
+
+			case 'amf':
+
+				console.warn("web loader not implemented for ." + extension);
+				// var loader = new THREE.AMFLoader();
+				// var amfobject = loader.load( file );
+
+				// editor.execute( new AddObjectCommand( amfobject ) );
+
+				break;
+
+			case 'awd':
+
+				console.warn("web loader not implemented for ." + extension);
+				// var loader = new THREE.AWDLoader();
+				// var scene = loader.load( file );
+
+				// editor.execute( new SetSceneCommand( scene ) );
+
+				break;
+
+			case 'babylon':
+
+				console.warn("web loader not implemented for ." + extension);
+
+				// reader.addEventListener( 'load', function ( event ) {
+
+				// 	var contents = event.target.result;
+				// 	var json = JSON.parse( contents );
+
+				// 	var loader = new THREE.BabylonLoader();
+				// 	var scene = loader.parse( json );
+
+				// 	editor.execute( new SetSceneCommand( scene ) );
+
+				break;
+
+			case 'babylonmeshdata':
+
+				console.warn("web loader not implemented for ." + extension);
+
+				// reader.addEventListener( 'load', function ( event ) {
+
+				// 	var contents = event.target.result;
+				// 	var json = JSON.parse( contents );
+
+				// 	var loader = new THREE.BabylonLoader();
+
+				// 	var geometry = loader.parseGeometry( json );
+				// 	var material = new THREE.MeshStandardMaterial();
+
+				// 	var mesh = new THREE.Mesh( geometry, material );
+				// 	mesh.name = filename;
+
+				// 	editor.execute( new AddObjectCommand( mesh ) );
+
+				// }, false );
+				// reader.readAsText( file );
+
+				break;
+
+			case 'ctm':
+
+				console.warn("web loader not implemented for ." + extension);
+
+				// reader.addEventListener( 'load', function ( event ) {
+
+				// 	var data = new Uint8Array( event.target.result );
+
+				// 	var stream = new CTM.Stream( data );
+				// 	stream.offset = 0;
+
+				// 	var loader = new THREE.CTMLoader();
+				// 	loader.createModel( new CTM.File( stream ), function( geometry ) {
+
+				// 		geometry.sourceType = "ctm";
+				// 		geometry.sourceFile = file.name;
+
+				// 		var material = new THREE.MeshStandardMaterial();
+
+				// 		var mesh = new THREE.Mesh( geometry, material );
+				// 		mesh.name = filename;
+
+				// 		editor.execute( new AddObjectCommand( mesh ) );
+
+				// 	} );
+
+				// }, false );
+				// reader.readAsArrayBuffer( file );
+
+				break;
+
+			case 'dae':
+
+				var loader = new THREE.ColladaLoader();
+				var collada = loader.load( file );
+
+				collada.scene.name = filename;
+
+				editor.execute( new AddObjectCommand( collada.scene ) );
+
+				break;
+
+			case 'fbx':
+
+				console.warn("web loader not implemented for ." + extension);
+
+				// var loader = new THREE.FBXLoader();
+				// var object = loader.load( file );
+
+				// editor.execute( new AddObjectCommand( object ) );
+
+				break;
+
+			case 'glb':
+			case 'gltf':
+
+				console.warn("web loader not implemented for ." + extension);
+				// reader.addEventListener( 'load', function ( event ) {
+
+				// 	var contents = event.target.result;
+
+				// 	var loader = new THREE.GLTFLoader();
+				// 	loader.parse( contents, '', function ( result ) {
+
+				// 		result.scene.name = filename;
+				// 		editor.execute( new AddObjectCommand( result.scene ) );
+
+				// 	} );
+
+				// }, false );
+				// reader.readAsArrayBuffer( file );
+
+				break;
+
+			case 'js':
+			case 'json':
+
+			case '3geo':
+			case '3mat':
+			case '3obj':
+			case '3scn':
+
+				console.warn("web loader not implemented for ." + extension);
+				// reader.addEventListener( 'load', function ( event ) {
+
+				// 	var contents = event.target.result;
+
+				// 	// 2.0
+
+				// 	if ( contents.indexOf( 'postMessage' ) !== - 1 ) {
+
+				// 		var blob = new Blob( [ contents ], { type: 'text/javascript' } );
+				// 		var url = URL.createObjectURL( blob );
+
+				// 		var worker = new Worker( url );
+
+				// 		worker.onmessage = function ( event ) {
+
+				// 			event.data.metadata = { version: 2 };
+				// 			handleJSON( event.data, file, filename );
+
+				// 		};
+
+				// 		worker.postMessage( Date.now() );
+
+				// 		return;
+
+				// 	}
+
+				// 	// >= 3.0
+
+				// 	var data;
+
+				// 	try {
+
+				// 		data = JSON.parse( contents );
+
+				// 	} catch ( error ) {
+
+				// 		alert( error );
+				// 		return;
+
+				// 	}
+
+				// 	handleJSON( data, file, filename );
+
+				// }, false );
+				// reader.readAsText( file );
+
+				break;
+
+
+			case 'kmz':
+
+				console.warn("web loader not implemented for ." + extension);
+				// reader.addEventListener( 'load', function ( event ) {
+
+				// 	var loader = new THREE.KMZLoader();
+				// 	var collada = loader.parse( event.target.result );
+
+				// 	collada.scene.name = filename;
+
+				// 	editor.execute( new AddObjectCommand( collada.scene ) );
+
+				// }, false );
+				// reader.readAsArrayBuffer( file );
+
+				break;
+
+			case 'md2':
+
+				console.warn("web loader not implemented for ." + extension);
+				// reader.addEventListener( 'load', function ( event ) {
+
+				// 	var contents = event.target.result;
+
+				// 	var geometry = new THREE.MD2Loader().parse( contents );
+				// 	var material = new THREE.MeshStandardMaterial( {
+				// 		morphTargets: true,
+				// 		morphNormals: true
+				// 	} );
+
+				// 	var mesh = new THREE.Mesh( geometry, material );
+				// 	mesh.mixer = new THREE.AnimationMixer( mesh );
+				// 	mesh.name = filename;
+
+				// 	editor.execute( new AddObjectCommand( mesh ) );
+
+				// }, false );
+				// reader.readAsArrayBuffer( file );
+
+				break;
+
+			case 'obj':
+
+				reader.addEventListener( 'load', function ( event ) {
+
+					var contents = event.target.result;
+
+					var object = new THREE.OBJLoader().parse( contents );
+					object.name = filename;
+
+					editor.execute( new AddObjectCommand( object ) );
+
+				}, false );
+				reader.readAsText( file );
+
+				break;
+
+			case 'playcanvas':
+
+				console.warn("web loader not implemented for ." + extension);
+				// reader.addEventListener( 'load', function ( event ) {
+
+				// 	var contents = event.target.result;
+				// 	var json = JSON.parse( contents );
+
+				// 	var loader = new THREE.PlayCanvasLoader();
+				// 	var object = loader.parse( json );
+
+				// 	editor.execute( new AddObjectCommand( object ) );
+
+				// }, false );
+				// reader.readAsText( file );
+
+				break;
+
+			case 'ply':
+
+				console.warn("web loader not implemented for ." + extension);
+				// reader.addEventListener( 'load', function ( event ) {
+
+				// 	var contents = event.target.result;
+
+				// 	var geometry = new THREE.PLYLoader().parse( contents );
+				// 	geometry.sourceType = "ply";
+				// 	geometry.sourceFile = file.name;
+
+				// 	var material = new THREE.MeshStandardMaterial();
+
+				// 	var mesh = new THREE.Mesh( geometry, material );
+				// 	mesh.name = filename;
+
+				// 	editor.execute( new AddObjectCommand( mesh ) );
+
+				// }, false );
+				// reader.readAsArrayBuffer( file );
+
+				break;
+
+			case 'stl':
+
+				console.warn("web loader not implemented for ." + extension);
+				// reader.addEventListener( 'load', function ( event ) {
+
+				// 	var contents = event.target.result;
+
+				// 	var geometry = new THREE.STLLoader().parse( contents );
+				// 	geometry.sourceType = "stl";
+				// 	geometry.sourceFile = file.name;
+
+				// 	var material = new THREE.MeshStandardMaterial();
+
+				// 	var mesh = new THREE.Mesh( geometry, material );
+				// 	mesh.name = filename;
+
+				// 	editor.execute( new AddObjectCommand( mesh ) );
+
+				// }, false );
+
+				// if ( reader.readAsBinaryString !== undefined ) {
+
+				// 	reader.readAsBinaryString( file );
+
+				// } else {
+
+				// 	reader.readAsArrayBuffer( file );
+
+				// }
+
+				break;
+
+			/*
+			case 'utf8':
+
+				reader.addEventListener( 'load', function ( event ) {
+
+					var contents = event.target.result;
+
+					var geometry = new THREE.UTF8Loader().parse( contents );
+					var material = new THREE.MeshLambertMaterial();
+
+					var mesh = new THREE.Mesh( geometry, material );
+
+					editor.execute( new AddObjectCommand( mesh ) );
+
+				}, false );
+				reader.readAsBinaryString( file );
+
+				break;
+			*/
+
+			case 'vtk':
+
+				console.warn("web loader not implemented for ." + extension);
+				// reader.addEventListener( 'load', function ( event ) {
+
+				// 	var contents = event.target.result;
+
+				// 	var geometry = new THREE.VTKLoader().parse( contents );
+				// 	geometry.sourceType = "vtk";
+				// 	geometry.sourceFile = file.name;
+
+				// 	var material = new THREE.MeshStandardMaterial();
+
+				// 	var mesh = new THREE.Mesh( geometry, material );
+				// 	mesh.name = filename;
+
+				// 	editor.execute( new AddObjectCommand( mesh ) );
+
+				// }, false );
+				// reader.readAsText( file );
+
+				break;
+
+			case 'wrl':
+
+				console.warn("web loader not implemented for ." + extension);
+				// reader.addEventListener( 'load', function ( event ) {
+
+				// 	var contents = event.target.result;
+
+				// 	var result = new THREE.VRMLLoader().parse( contents );
+
+				// 	editor.execute( new SetSceneCommand( result ) );
+
+				// }, false );
+				// reader.readAsText( file );
+
+				break;
+
+			case 'zip':
+
+				console.warn("web loader not implemented for ." + extension);
+				// reader.addEventListener( 'load', function ( event ) {
+
+				// 	var contents = event.target.result;
+
+				// 	var zip = new JSZip( contents );
+
+				// 	// BLOCKS
+
+				// 	if ( zip.files[ 'model.obj' ] && zip.files[ 'materials.mtl' ] ) {
+
+				// 		var materials = new THREE.MTLLoader().parse( zip.file( 'materials.mtl' ).asText() );
+				// 		var object = new THREE.OBJLoader().setMaterials( materials ).parse( zip.file( 'model.obj' ).asText() );
+				// 		editor.execute( new AddObjectCommand( object ) );
+
+				// 	}
+
+				// }, false );
+				// reader.readAsBinaryString( file );
+
+				break;
+
+			default:
+
+				alert( 'Unsupported file format (' + extension +  ').' );
+
+				break;
+
+		}
+
+	}
+
 	this.loadFile = function ( file ) {
 
 		var filename = file.name;
